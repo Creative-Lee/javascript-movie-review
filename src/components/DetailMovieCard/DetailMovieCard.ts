@@ -8,16 +8,14 @@ import { StarCount } from '../../domain/PersonalVoteHandler';
 
 import './detailMovieCard.css';
 
-const voteScoreText = {
+const voteScoreText: Record<StarCount, string> = {
   0: '이 영화는...🤔',
-  2: '최악이예요🤮',
-  4: '별로예요😟',
-  6: '보통이에요😐',
-  8: '재미있어요🙂',
-  10: '명작이에요😎',
-} as const;
-
-type StarScore = keyof typeof voteScoreText;
+  1: '최악이예요🤮',
+  2: '별로예요😟',
+  3: '보통이에요😐',
+  4: '재미있어요🙂',
+  5: '명작이에요😎',
+};
 
 const STAR_BUTTON_COUNT = 5;
 
@@ -93,9 +91,8 @@ export default class DetailMovieCard {
   }
 
   voteScoreTemplate(starCount: StarCount) {
-    const score = (starCount * 2) as StarScore;
-    const scoreText = voteScoreText[score];
-    return `<span class="movie-vote-score">${score}점</span><span>- ${scoreText}</span>`;
+    const scoreText = voteScoreText[starCount];
+    return `<span class="movie-vote-score">${starCount * 2}점</span><span>- ${scoreText}</span>`;
   }
 
   bindVoteButtonClickEvent() {
