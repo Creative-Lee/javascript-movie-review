@@ -2,7 +2,6 @@ import MovieCard from '../MovieCard/MovieCard';
 
 import Component from '../../type/Component';
 import { Movie } from '../../type/Movie';
-import { MovieMetadata, FaildData } from '../../api/get';
 
 import { observerOptionMaker } from '../../utils';
 
@@ -80,26 +79,6 @@ export default class MovieList implements Component {
     if (!($observeTarget instanceof HTMLDivElement)) return;
 
     this.observer.unobserve($observeTarget);
-  }
-
-  renderListContent(movieMetaData: MovieMetadata | FaildData) {
-    if (!movieMetaData.isOk) {
-      const { statusCode, statusMessage } = movieMetaData;
-
-      this.hideSkeletonList();
-      this.renderErrorTemplate(statusCode, statusMessage);
-
-      return;
-    }
-
-    const { movieList, page, totalPages } = movieMetaData;
-
-    if (this.isLastPage(page, totalPages)) {
-      this.unObserve();
-    }
-
-    this.hideSkeletonList();
-    this.renderMovieCards(movieList);
   }
 
   renderErrorTemplate(statusCode: number, statusMessage: string) {

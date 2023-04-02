@@ -41,29 +41,49 @@ export default class App {
 
   async initialRender() {
     this.#header.render();
+    this.#modal.render();
     this.#movieList.render();
     this.#movieList.showSkeletonList();
-    this.#movieList.renderListContent(await this.#getMovieMetaData());
-    this.#modal.render();
+    this.renderMovieListContent(await this.#getMovieMetaData());
   }
 
   async renderPopularMovieList() {
     this.assignPopularMovieDataFetchFunc();
     this.#movieList.render();
     this.#movieList.showSkeletonList();
-    this.#movieList.renderListContent(await this.#getMovieMetaData());
+    this.renderMovieListContent(await this.#getMovieMetaData());
   }
 
   async renderSearchedMovieList(query) {
     this.assignSearchedMovieDataFetchFunc(query);
     this.#movieList.render(query);
     this.#movieList.showSkeletonList();
-    this.#movieList.renderListContent(await this.#getMovieMetaData());
+    this.renderMovieListContent(await this.#getMovieMetaData());
   }
 
   async renderMovieList() {
     this.#movieList.showSkeletonList();
-    this.#movieList.renderListContent(await this.#getMovieMetaData());
+    this.renderMovieListContent(await this.#getMovieMetaData());
+  }
+
+  renderMovieListContent(movieMetaData) {
+    if (!movieMetaData.isOk) {
+      const { statusCode, statusMessage } = movieMetaData;
+
+      this.#movieList.hideSkeletonList();
+      this.#movieList.renderErrorTemplate(statusCode, statusMessage);
+
+      return;
+    }
+
+    const { movieList, page, totalPages } = movieMetaData;
+
+    if (this.#movieList.isLastPage(page, totalPages)) {
+      this.#movieList.unObserve();
+    }
+
+    this.#movieList.hideSkeletonList();
+    this.#movieList.renderMovieCards(movieList);
   }
 
   async renderModalContent(movieId) {
