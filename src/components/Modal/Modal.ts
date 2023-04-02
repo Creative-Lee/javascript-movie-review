@@ -54,7 +54,7 @@ export default class Modal implements Component {
 
   bindBackdropClickEvent() {
     const $modalBackdrop = this.$element.querySelector('.modal-backdrop');
-    if (!$modalBackdrop) return;
+    if ($modalBackdrop === null) return;
 
     $modalBackdrop.addEventListener('click', () => {
       this.clearContent();
@@ -75,7 +75,7 @@ export default class Modal implements Component {
   renderContent(detailMovieData: DetailMovie, starCount: StarCount) {
     this.openModal();
     const $container = this.$element.querySelector('.modal-container');
-    if (!$container) return;
+    if ($container === null) return;
 
     const detailMovieCard = new DetailMovieCard($container, {
       onClickVoteButton: this.handlerCallback.onClickVoteButton.bind(this),
@@ -86,7 +86,7 @@ export default class Modal implements Component {
   renderErrorTemplate(statusCode: number, statusMessage: string) {
     this.openModal();
     const $container = this.$element.querySelector('.modal-container');
-    if (!$container) return;
+    if ($container === null) return;
 
     $container.insertAdjacentHTML('beforeend', errorTemplate(statusCode, statusMessage));
   }
@@ -101,7 +101,7 @@ export default class Modal implements Component {
 
   clearContent() {
     const $container = this.$element.querySelector('.modal-container');
-    if (!$container) return;
+    if ($container === null) return;
 
     $container.lastChild?.remove();
   }

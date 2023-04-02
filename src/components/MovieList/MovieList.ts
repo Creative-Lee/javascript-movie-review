@@ -108,7 +108,7 @@ export default class MovieList implements Component {
 
   renderMovieCards(movieList: Movie[]) {
     const $ul = this.$element.querySelector('.item-list');
-    if (!$ul) return;
+    if ($ul === null) return;
 
     movieList.forEach((movie) => {
       new MovieCard($ul, { onClickCard: this.handlerCallback.onClickCard }).render(movie);

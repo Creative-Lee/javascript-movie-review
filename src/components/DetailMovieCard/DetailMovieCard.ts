@@ -97,18 +97,19 @@ export default class DetailMovieCard {
 
   bindVoteButtonClickEvent() {
     const $movieVoteContainer = $('.movie-vote-container');
-    if (!$movieVoteContainer) return;
+    if ($movieVoteContainer === null) return;
 
     $movieVoteContainer.addEventListener('click', (e) => {
       if (!(e.target instanceof HTMLElement)) return;
 
       const $button = e.target.closest<HTMLButtonElement>('.movie-vote-button');
-      if (!$button) return;
+      if ($button === null) return;
 
       const starCount = Number($button.dataset.starCount) as StarCount;
 
       const $movieDetailView = $('.movie-detail-view');
-      if (!$movieDetailView) return;
+      if ($movieDetailView === null) return;
+
       const movieId = $movieDetailView.id;
 
       this.handlerCallback.onClickVoteButton(movieId, starCount);

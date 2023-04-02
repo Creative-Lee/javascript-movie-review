@@ -44,7 +44,7 @@ export default class MovieCard implements Component {
   onClickCard(e: MouseEvent) {
     const target = e.target as Element;
     const $li = target.closest<HTMLLIElement>('.item-card');
-    if (!$li) return;
+    if ($li === null) return;
 
     const movieId = $li.dataset.id as string;
 
