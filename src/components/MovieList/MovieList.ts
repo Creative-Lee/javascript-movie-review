@@ -1,10 +1,13 @@
-import MovieCard from './MovieCard';
+import MovieCard from '../MovieCard/MovieCard';
 
-import { Movie } from '../type/Movie';
-import { MovieMetadata, FaildData } from '../api/get';
+import Component from '../../type/Component';
+import { Movie } from '../../type/Movie';
 
-import errorImg from '../assets/error.jpg';
-import Component from '../type/Component';
+import { createIntersectionObserver } from '../../utils';
+
+import errorImg from '../../assets/error.jpg';
+
+import './movieList.css';
 
 const headerTemplate = {
   popular: '지금 인기 있는 영화',
@@ -25,11 +28,16 @@ const errorTemplate = (statusCode: number, statusMessage: string) => {
 };
 
 type HandlerCallback = {
-  onClickMoreButton: () => void;
+  onObserveElement: () => void;
+  onClickCard: (movieId: string) => void;
 };
 
 export default class MovieList implements Component {
   private $element;
+  private intersectionObserver = createIntersectionObserver({
+    onIntersection: this.handlerCallback.onObserveElement,
+    option: { rootMargin: '1200px 0px' },
+  });
 
   constructor($parent: Element, private handlerCallback: HandlerCallback) {
     this.$element = document.createElement('section');
@@ -47,39 +55,30 @@ export default class MovieList implements Component {
     const header = query ? headerTemplate.search(query) : headerTemplate.popular;
 
     return /* html */ `
-    <h2>${header}</h2>     
+    <h2 class="list-title">${header}</h2>     
     <ul class="item-list"></ul> 
     <ul class="skeleton-item-list item-list hide">
       ${this.getSkeletonCardsHTML(20)}
     </ul>
-    <button id="more-button" class="btn primary full-width">더 보기</button>`;
+    <div id="observe-target" class="observe-target"></div>`;
   }
 
   setEvent() {
-    const moreButton = this.$element.querySelector('#more-button');
-    if (!(moreButton instanceof HTMLButtonElement)) return;
-
-    moreButton.addEventListener('click', this.handlerCallback.onClickMoreButton.bind(this));
+    this.observe();
   }
 
-  renderListContent(movieMetaData: MovieMetadata | FaildData) {
-    if (!movieMetaData.isOk) {
-      const { statusCode, statusMessage } = movieMetaData;
+  observe() {
+    const $observeTarget = this.$element.querySelector('#observe-target');
+    if (!($observeTarget instanceof HTMLDivElement)) return;
 
-      this.hideSkeletonList();
-      this.renderErrorTemplate(statusCode, statusMessage);
+    this.intersectionObserver.observe($observeTarget);
+  }
 
-      return;
-    }
+  unObserve() {
+    const $observeTarget = this.$element.querySelector('#observe-target');
+    if (!($observeTarget instanceof HTMLDivElement)) return;
 
-    const { movieList, page, totalPages } = movieMetaData;
-
-    if (this.isLastPage(page, totalPages)) {
-      this.hideMoreButton();
-    }
-
-    this.hideSkeletonList();
-    this.renderMovieCards(movieList);
+    this.intersectionObserver.unobserve($observeTarget);
   }
 
   renderErrorTemplate(statusCode: number, statusMessage: string) {
@@ -87,10 +86,11 @@ export default class MovieList implements Component {
   }
 
   renderMovieCards(movieList: Movie[]) {
-    movieList.forEach((movie) => {
-      const $ul = this.$element.querySelector('.item-list');
+    const $ul = this.$element.querySelector('.item-list');
+    if ($ul === null) return;
 
-      if ($ul) new MovieCard($ul).render(movie);
+    movieList.forEach((movie) => {
+      new MovieCard($ul, { onClickCard: this.handlerCallback.onClickCard }).render(movie);
     });
   }
 
