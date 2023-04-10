@@ -3,7 +3,7 @@ import MovieCard from '../MovieCard/MovieCard';
 import Component from '../../type/Component';
 import { Movie } from '../../type/Movie';
 
-import { observerOptionMaker } from '../../utils';
+import { createIntersectionObserver } from '../../utils';
 
 import errorImg from '../../assets/error.jpg';
 
@@ -34,10 +34,10 @@ type HandlerCallback = {
 
 export default class MovieList implements Component {
   private $element;
-  private observer = new IntersectionObserver((entries) => {
-    if (!entries[0].isIntersecting) return;
-    this.handlerCallback.onObserveElement();
-  }, observerOptionMaker('1200px 0px', 0));
+  private intersectionObserver = createIntersectionObserver({
+    onIntersection: this.handlerCallback.onObserveElement,
+    option: { rootMargin: '1200px 0px' },
+  });
 
   constructor($parent: Element, private handlerCallback: HandlerCallback) {
     this.$element = document.createElement('section');
@@ -71,14 +71,14 @@ export default class MovieList implements Component {
     const $observeTarget = this.$element.querySelector('#observe-target');
     if (!($observeTarget instanceof HTMLDivElement)) return;
 
-    this.observer.observe($observeTarget);
+    this.intersectionObserver.observe($observeTarget);
   }
 
   unObserve() {
     const $observeTarget = this.$element.querySelector('#observe-target');
     if (!($observeTarget instanceof HTMLDivElement)) return;
 
-    this.observer.unobserve($observeTarget);
+    this.intersectionObserver.unobserve($observeTarget);
   }
 
   renderErrorTemplate(statusCode: number, statusMessage: string) {
